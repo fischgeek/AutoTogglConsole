@@ -69,9 +69,9 @@ namespace AutoTogglConsole
         public static bool ConsoleEventCallback(int eventType)
         {
             var tb = TogglBase.GetInstance();
-            tb.Init("547b7d7d5e9b3bee1c880716e0840035==");
+            tb.Init(System.Configuration.ConfigurationManager.AppSettings["apiKey"] + "==");
             tb.StopRunningTimer();
-            
+
             if (eventType == 2) {
                 Console.WriteLine("Console window closing, death imminent");
                 Debug.WriteLine("Console window closing, death imminent");

@@ -1,6 +1,7 @@
 ﻿using SharedLibrary;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -16,77 +17,25 @@ namespace AutoTogglConsole
         public static string lastActive = string.Empty;
         public static bool idle = false;
         public static bool aTimerIsRunning = false;
-        //public static Project custerProject = new Project() {
-        //    name = "Custer Health"
-        //    , pid = 148463318
-        //    , keywords = new List<string>() {
-        //        "custer"
-        //        , "ndphsoft"
-        //        , "web50"
-        //    }
-        //};
-        //public static Project spsProject = new Project() {
-        //    name = "SPS"
-        //    , pid = 154608648
-        //    , keywords = new List<string>() {
-        //        "sps"
-        //    }
-        //};
-        //public static Project timsProject = new Project() {
-        //    name = "TIMS"
-        //    , pid = 154608855
-        //    , keywords = new List<string>() {
-        //        "tims"
-        //    }
-        //};
-        public static Project wcriProject = new Project() {
-            name = "WCRI"
-            , pid = 155152245
-            , keywords = new List<string>() {
-                "wcri"
-                , "western capital"
-                , "forticlient"
-                , "cricket"
-                , "service desk"
+        public static bool IsNeutralWindow(string title) => Regex.IsMatch(title, ConfigurationManager.AppSettings["NeutralWindowRegex"], RegexOptions.IgnoreCase);
+        private static List<Project> GetProjectsFromAppSettings()
+        {
+            var l = new List<Project>();
+            foreach (string item in ConfigurationManager.AppSettings.Keys) {
+                var chunks = item.Split(':');
+                if (chunks[0] == "Project") {
+                    l.Add(new Project { name = chunks[1], pid = int.Parse(chunks[2]), keywords = ConfigurationManager.AppSettings[item].Split(',').ToList() });
+                }
             }
-        };
-        //public static Project jiraProject = new Project() {
-        //    name = "Jira"
-        //    , pid = 154613363
-        //    , keywords = new List<string>() {
-        //        "service desk"
-        //        , "wcridesk"
-        //        , "termination"
-        //    }
-        //};
-        //public static Project devTechProject = new Project() {
-        //    name = "DevTech"
-        //    , pid = 154626682
-        //    , keywords = new List<string>() {
-        //        "devtech"
-        //    }
-        //};
-        public static List<string> neutralWindows = new List<string>() {
-            "Task Switching"
-            , "Windows PowerShell"
-            , "Administrator: Windows PowerShell"
-            , "Administration - Google Chrome"
-            , "People - Jira - Google Chrome"
-        };
-        public static List<Project> projects = new List<Project>() {
-            //timsProject
-            //, spsProject
-            //, custerProject
-            //jiraProject
-            wcriProject
-            //, devTechProject
-        };
+            return l;
+        }
+        //public static List<Project> projects = ReadFromAppSettings();
 
         static void Main(string[] args)
         {
             handler = new ConsoleEventDelegate(ConsoleEventCallback);
             SetConsoleCtrlHandler(handler, true);
-            tb.Init(JFUtil.Base64Encode("547b7d7d5e9b3bee1c880716e0840035:api_token"));
+            tb.Init(JFUtil.Base64Encode($@"{ConfigurationManager.AppSettings["apiKey"]}:api_token"));
             CheckForARunningTimer();
             while (true) {
                 CheckIdleTime();
@@ -111,7 +60,7 @@ namespace AutoTogglConsole
                 if (CurrentActiveIsValid(currentActive)) {
                     clt(currentActive);
                     var anyMatches = false;
-                    foreach (var project in projects) {
+                    foreach (var project in GetProjectsFromAppSettings()) {
                         if (KeywordExistsInActiveWindowTitle(project, currentActive)) {
                             StartTimer(project, currentActive);
                             anyMatches = true;
@@ -128,7 +77,7 @@ namespace AutoTogglConsole
             }
         }
 
-        private static bool CurrentActiveIsValid(string currentActive) => lastActive != currentActive && currentActive.JFIsNotNull() && !neutralWindows.Contains(currentActive);
+        private static bool CurrentActiveIsValid(string currentActive) => lastActive != currentActive && currentActive.JFIsNotNull() && !IsNeutralWindow(currentActive);
 
         private static bool KeywordExistsInActiveWindowTitle(Project project, string currentActive)
         {
@@ -165,14 +114,24 @@ namespace AutoTogglConsole
                 TimeEntryWrapper wrapper = new TimeEntryWrapper();
                 wrapper.time_entry = new TimeEntry() {
                     description = description
-                    , wid = 3757896
+                    , wid = int.Parse(ConfigurationManager.AppSettings["WorkspaceID"])
                     , pid = project.pid
                     , created_with = ".net"
                 };
                 tb.StartTimer(wrapper);
+                logTimerStart(project.name);
                 clt($"Tracking started for {project.name}.");
             }
             aTimerIsRunning = true;
+        }
+
+        private static void logTimerStart(string name)
+        {
+            try {
+                System.IO.File.AppendAllLines(@"c:\temp\AutoTogglConsole_recent.txt", new string[] { name });
+            }
+            catch  {
+            }
         }
     }
 }
