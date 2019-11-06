@@ -29,7 +29,6 @@ namespace AutoTogglConsole
             }
             return l;
         }
-        //public static List<Project> projects = ReadFromAppSettings();
 
         static void Main(string[] args)
         {
