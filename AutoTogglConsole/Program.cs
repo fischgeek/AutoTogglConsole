@@ -1,4 +1,4 @@
-﻿using SharedLibrary;
+using SharedLibrary;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,77 +16,30 @@ namespace AutoTogglConsole
         public static string lastActive = string.Empty;
         public static bool idle = false;
         public static bool aTimerIsRunning = false;
-        //public static Project custerProject = new Project() {
-        //    name = "Custer Health"
-        //    , pid = 148463318
-        //    , keywords = new List<string>() {
-        //        "custer"
-        //        , "ndphsoft"
-        //        , "web50"
-        //    }
-        //};
-        //public static Project spsProject = new Project() {
-        //    name = "SPS"
-        //    , pid = 154608648
-        //    , keywords = new List<string>() {
-        //        "sps"
-        //    }
-        //};
-        //public static Project timsProject = new Project() {
-        //    name = "TIMS"
-        //    , pid = 154608855
-        //    , keywords = new List<string>() {
-        //        "tims"
-        //    }
-        //};
-        public static Project wcriProject = new Project() {
-            name = "WCRI"
-            , pid = 155152245
+        public static Project aProject = new Project() {
+            name = "Project Title"
+            , pid = 0000000 // get from toggl.com/app/projects
             , keywords = new List<string>() {
-                "wcri"
-                , "western capital"
-                , "forticlient"
-                , "cricket"
-                , "service desk"
+                "keyword"
+                , "keyword2"
+                , "keyword3"
             }
         };
-        //public static Project jiraProject = new Project() {
-        //    name = "Jira"
-        //    , pid = 154613363
-        //    , keywords = new List<string>() {
-        //        "service desk"
-        //        , "wcridesk"
-        //        , "termination"
-        //    }
-        //};
-        //public static Project devTechProject = new Project() {
-        //    name = "DevTech"
-        //    , pid = 154626682
-        //    , keywords = new List<string>() {
-        //        "devtech"
-        //    }
-        //};
         public static List<string> neutralWindows = new List<string>() {
             "Task Switching"
             , "Windows PowerShell"
             , "Administrator: Windows PowerShell"
             , "Administration - Google Chrome"
-            , "People - Jira - Google Chrome"
         };
         public static List<Project> projects = new List<Project>() {
-            //timsProject
-            //, spsProject
-            //, custerProject
-            //jiraProject
-            wcriProject
-            //, devTechProject
+            aProject
         };
 
         static void Main(string[] args)
         {
             handler = new ConsoleEventDelegate(ConsoleEventCallback);
             SetConsoleCtrlHandler(handler, true);
-            tb.Init(JFUtil.Base64Encode("547b7d7d5e9b3bee1c880716e0840035:api_token"));
+            tb.Init("Base64(APITOKEN:api_token)"); // Base64 encode your api token (toggl.com/app/profile
             CheckForARunningTimer();
             while (true) {
                 CheckIdleTime();
@@ -165,7 +118,7 @@ namespace AutoTogglConsole
                 TimeEntryWrapper wrapper = new TimeEntryWrapper();
                 wrapper.time_entry = new TimeEntry() {
                     description = description
-                    , wid = 3757896
+                    , wid = 0000000 // your workspace id (toggl.com/app/workspaces)
                     , pid = project.pid
                     , created_with = ".net"
                 };

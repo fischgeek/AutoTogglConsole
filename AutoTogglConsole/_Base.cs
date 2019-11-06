@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -69,7 +69,7 @@ namespace AutoTogglConsole
         public static bool ConsoleEventCallback(int eventType)
         {
             var tb = TogglBase.GetInstance();
-            tb.Init("547b7d7d5e9b3bee1c880716e0840035==");
+            tb.Init("ZmlzY2hnZWVrQGdtYWlsLmNvbTpNaWFoIzM5MQ==");
             tb.StopRunningTimer();
             
             if (eventType == 2) {
