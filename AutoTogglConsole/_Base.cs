@@ -71,7 +71,7 @@ namespace AutoTogglConsole
             var tb = TogglBase.GetInstance();
             tb.Init(System.Configuration.ConfigurationManager.AppSettings["apiKey"] + "==");
             tb.StopRunningTimer();
-
+            
             if (eventType == 2) {
                 Console.WriteLine("Console window closing, death imminent");
                 Debug.WriteLine("Console window closing, death imminent");
