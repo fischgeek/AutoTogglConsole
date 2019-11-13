@@ -44,7 +44,7 @@ namespace AutoTogglConsole
             while (true) {
                 CheckIdleTime();
                 CheckActiveWindow();
-                System.Threading.Thread.Sleep(5000);
+                System.Threading.Thread.Sleep(5000); // Adjust if you wish to have a different delay
             }
         }
 
