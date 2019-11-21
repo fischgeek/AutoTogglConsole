@@ -69,7 +69,7 @@ namespace AutoTogglConsole
         public static bool ConsoleEventCallback(int eventType)
         {
             var tb = TogglBase.GetInstance();
-            tb.Init("ZmlzY2hnZWVrQGdtYWlsLmNvbTpNaWFoIzM5MQ==");
+            tb.Init(System.Configuration.ConfigurationManager.AppSettings["apiKey"] + "==");
             tb.StopRunningTimer();
             
             if (eventType == 2) {

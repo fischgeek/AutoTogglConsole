@@ -1,6 +1,7 @@
 ﻿using SharedLibrary;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -16,35 +17,34 @@ namespace AutoTogglConsole
         public static string lastActive = string.Empty;
         public static bool idle = false;
         public static bool aTimerIsRunning = false;
-        public static Project aProject = new Project() {
-            name = "Project Title"
-            , pid = 0000000 // get from toggl.com/app/projects
-            , keywords = new List<string>() {
-                "keyword"
-                , "keyword2"
-                , "keyword3"
+        public static bool IsNeutralWindow(string title) => Regex.IsMatch(title, ConfigurationManager.AppSettings["NeutralWindowRegex"], RegexOptions.IgnoreCase);
+        private static List<Project> GetProjectsFromAppSettings()
+        {
+            var l = new List<Project>();
+            foreach (string item in ConfigurationManager.AppSettings.Keys) {
+                var chunks = item.Split(':');
+                if (chunks[0] == "Project") {
+                    l.Add(new Project { name = chunks[1], pid = int.Parse(chunks[2]), keywords = ConfigurationManager.AppSettings[item].Split(',').ToList() });
+                }
             }
-        };
-        public static List<string> neutralWindows = new List<string>() {
-            "Task Switching"
-            , "Windows PowerShell"
-            , "Administrator: Windows PowerShell"
-            , "Administration - Google Chrome"
-        };
-        public static List<Project> projects = new List<Project>() {
-            aProject
-        };
+            return l;
+        }
 
         static void Main(string[] args)
         {
-            handler = new ConsoleEventDelegate(ConsoleEventCallback);
-            SetConsoleCtrlHandler(handler, true);
-            tb.Init("Base64(APITOKEN:api_token)"); // Base64 encode your api token (toggl.com/app/profile
-            CheckForARunningTimer();
-            while (true) {
-                CheckIdleTime();
-                CheckActiveWindow();
-                System.Threading.Thread.Sleep(5000); // Adjust if you wish to have a different delay
+            if (ConfigurationManager.AppSettings == null || ConfigurationManager.AppSettings.Count == 0) {
+                Console.WriteLine("Application settings are missing");
+                Console.ReadLine();
+            } else {
+                handler = new ConsoleEventDelegate(ConsoleEventCallback);
+                SetConsoleCtrlHandler(handler, true);
+                tb.Init(JFUtil.Base64Encode($@"{ConfigurationManager.AppSettings["apiKey"]}:api_token"));
+                CheckForARunningTimer();
+                while (true) {
+                    CheckIdleTime();
+                    CheckActiveWindow();
+                    System.Threading.Thread.Sleep(5000);
+                }
             }
         }
 
@@ -64,7 +64,7 @@ namespace AutoTogglConsole
                 if (CurrentActiveIsValid(currentActive)) {
                     clt(currentActive);
                     var anyMatches = false;
-                    foreach (var project in projects) {
+                    foreach (var project in GetProjectsFromAppSettings()) {
                         if (KeywordExistsInActiveWindowTitle(project, currentActive)) {
                             StartTimer(project, currentActive);
                             anyMatches = true;
@@ -81,7 +81,7 @@ namespace AutoTogglConsole
             }
         }
 
-        private static bool CurrentActiveIsValid(string currentActive) => lastActive != currentActive && currentActive.JFIsNotNull() && !neutralWindows.Contains(currentActive);
+        private static bool CurrentActiveIsValid(string currentActive) => lastActive != currentActive && currentActive.JFIsNotNull() && !IsNeutralWindow(currentActive);
 
         private static bool KeywordExistsInActiveWindowTitle(Project project, string currentActive)
         {
@@ -118,14 +118,24 @@ namespace AutoTogglConsole
                 TimeEntryWrapper wrapper = new TimeEntryWrapper();
                 wrapper.time_entry = new TimeEntry() {
                     description = description
-                    , wid = 0000000 // your workspace id (toggl.com/app/workspaces)
+                    , wid = int.Parse(ConfigurationManager.AppSettings["WorkspaceID"])
                     , pid = project.pid
                     , created_with = ".net"
                 };
                 tb.StartTimer(wrapper);
+                logTimerStart(project.name);
                 clt($"Tracking started for {project.name}.");
             }
             aTimerIsRunning = true;
+        }
+
+        private static void logTimerStart(string name)
+        {
+            try {
+                System.IO.File.AppendAllLines(@"c:\temp\AutoTogglConsole_recent.txt", new string[] { name });
+            }
+            catch {
+            }
         }
     }
 }

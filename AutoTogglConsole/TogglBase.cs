@@ -31,9 +31,13 @@ namespace AutoTogglConsole
         public TimeEntry GetRunningTimer()
         {
             var x = WebCall.GetRequestWithErrorHandling($"{baseUrl}/time_entries/current", this.apiKey);
-            var t = JsonConvert.DeserializeObject<TimeEntryData>(x.Data);
-            var timeEntry = t.data;
-            return timeEntry;
+            if (x.IsSuccessful) {
+                var t = JsonConvert.DeserializeObject<TimeEntryData>(x.Data);
+                var timeEntry = t.data;
+                return timeEntry;
+            } else {
+                return null;
+            }
         }
 
         public void StartTimer(TimeEntryWrapper wrapper)
