@@ -32,14 +32,19 @@ namespace AutoTogglConsole
 
         static void Main(string[] args)
         {
-            handler = new ConsoleEventDelegate(ConsoleEventCallback);
-            SetConsoleCtrlHandler(handler, true);
-            tb.Init(JFUtil.Base64Encode($@"{ConfigurationManager.AppSettings["apiKey"]}:api_token"));
-            CheckForARunningTimer();
-            while (true) {
-                CheckIdleTime();
-                CheckActiveWindow();
-                System.Threading.Thread.Sleep(5000);
+            if (ConfigurationManager.AppSettings == null || ConfigurationManager.AppSettings.Count == 0) {
+                Console.WriteLine("Application settings are missing");
+                Console.ReadLine();
+            } else {
+                handler = new ConsoleEventDelegate(ConsoleEventCallback);
+                SetConsoleCtrlHandler(handler, true);
+                tb.Init(JFUtil.Base64Encode($@"{ConfigurationManager.AppSettings["apiKey"]}:api_token"));
+                CheckForARunningTimer();
+                while (true) {
+                    CheckIdleTime();
+                    CheckActiveWindow();
+                    System.Threading.Thread.Sleep(5000);
+                }
             }
         }
 
@@ -129,7 +134,7 @@ namespace AutoTogglConsole
             try {
                 System.IO.File.AppendAllLines(@"c:\temp\AutoTogglConsole_recent.txt", new string[] { name });
             }
-            catch  {
+            catch {
             }
         }
     }
