@@ -14,21 +14,23 @@ namespace AutoTogglConsole
         public static string lastActive = string.Empty;
         public static bool idle = false;
         public static bool aTimerIsRunning = false;
+        public static List<Project> AllProjects = new List<Project>();
 
         private static List<Project> GetProjectsFromAppSettings()
         {
-            var l = new List<Project>();
-            foreach (string item in ConfigurationManager.AppSettings.Keys) {
-                var chunks = item.Split(':');
-                if (chunks[0] == "Project") {
-                    l.Add(new Project {
-                        name = chunks[1],
-                        pid = int.Parse(chunks[2]),
-                        keywords = ConfigurationManager.AppSettings[item].Split(',').ToList()
-                    });
+            if (AllProjects.Count == 0) {
+                foreach (string item in ConfigurationManager.AppSettings.Keys) {
+                    var chunks = item.Split(':');
+                    if (chunks[0] == "Project") {
+                        AllProjects.Add(new Project {
+                            name = chunks[1],
+                            pid = int.Parse(chunks[2]),
+                            keywords = ConfigurationManager.AppSettings[item].Split(',').ToList()
+                        });
+                    }
                 }
             }
-            return l;
+            return AllProjects;
         }
 
         static void Main(string[] args)
