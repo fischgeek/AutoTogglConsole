@@ -1,5 +1,7 @@
-﻿using System;
+﻿using SharedLibrary;
+using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -69,7 +71,7 @@ namespace AutoTogglConsole
         public static bool ConsoleEventCallback(int eventType)
         {
             var tb = TogglBase.GetInstance();
-            tb.Init(System.Configuration.ConfigurationManager.AppSettings["apiKey"] + "==");
+            tb.Init(JFUtil.Base64Encode($@"{ConfigurationManager.AppSettings["apiKey"]}:api_token"));
             tb.StopRunningTimer();
             
             if (eventType == 2) {

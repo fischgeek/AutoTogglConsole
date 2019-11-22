@@ -3,10 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using static SharedLibrary.ConsoleShortcuts;
 
 namespace AutoTogglConsole
@@ -17,14 +14,18 @@ namespace AutoTogglConsole
         public static string lastActive = string.Empty;
         public static bool idle = false;
         public static bool aTimerIsRunning = false;
-        public static bool IsNeutralWindow(string title) => Regex.IsMatch(title, ConfigurationManager.AppSettings["NeutralWindowRegex"], RegexOptions.IgnoreCase);
+
         private static List<Project> GetProjectsFromAppSettings()
         {
             var l = new List<Project>();
             foreach (string item in ConfigurationManager.AppSettings.Keys) {
                 var chunks = item.Split(':');
                 if (chunks[0] == "Project") {
-                    l.Add(new Project { name = chunks[1], pid = int.Parse(chunks[2]), keywords = ConfigurationManager.AppSettings[item].Split(',').ToList() });
+                    l.Add(new Project {
+                        name = chunks[1],
+                        pid = int.Parse(chunks[2]),
+                        keywords = ConfigurationManager.AppSettings[item].Split(',').ToList()
+                    });
                 }
             }
             return l;
@@ -33,7 +34,7 @@ namespace AutoTogglConsole
         static void Main(string[] args)
         {
             if (ConfigurationManager.AppSettings == null || ConfigurationManager.AppSettings.Count == 0) {
-                Console.WriteLine("Application settings are missing");
+                Console.WriteLine("Application settings are missing.");
                 Console.ReadLine();
             } else {
                 handler = new ConsoleEventDelegate(ConsoleEventCallback);
@@ -81,6 +82,8 @@ namespace AutoTogglConsole
             }
         }
 
+        public static bool IsNeutralWindow(string title) => Regex.IsMatch(title, ConfigurationManager.AppSettings["NeutralWindowRegex"], RegexOptions.IgnoreCase);
+
         private static bool CurrentActiveIsValid(string currentActive) => lastActive != currentActive && currentActive.JFIsNotNull() && !IsNeutralWindow(currentActive);
 
         private static bool KeywordExistsInActiveWindowTitle(Project project, string currentActive)
@@ -123,7 +126,7 @@ namespace AutoTogglConsole
                     , created_with = ".net"
                 };
                 tb.StartTimer(wrapper);
-                logTimerStart(project.name);
+                //logTimerStart(project.name); // optional logging
                 clt($"Tracking started for {project.name}.");
             }
             aTimerIsRunning = true;
@@ -133,8 +136,7 @@ namespace AutoTogglConsole
         {
             try {
                 System.IO.File.AppendAllLines(@"c:\temp\AutoTogglConsole_recent.txt", new string[] { name });
-            }
-            catch {
+            } catch {
             }
         }
     }
