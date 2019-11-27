@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Text.RegularExpressions;
+using TogglConnect;
 using static SharedLibrary.ConsoleShortcuts;
 
 namespace AutoTogglConsole
@@ -11,6 +12,7 @@ namespace AutoTogglConsole
     class Program : _Base
     {
         private static TogglBase tb = TogglBase.GetInstance();
+        public static int WorkspaceId;
         public static string lastActive = string.Empty;
         public static bool idle = false;
         public static bool aTimerIsRunning = false;
@@ -20,15 +22,14 @@ namespace AutoTogglConsole
         {
             if (AllProjects.Count == 0) {
                 foreach (string item in ConfigurationManager.AppSettings.Keys) {
-                    var chunks = item.Split(':');
-                    if (chunks[0] == "Project") {
-                        AllProjects.Add(new Project {
-                            name = chunks[1],
-                            pid = int.Parse(chunks[2]),
-                            keywords = ConfigurationManager.AppSettings[item].Split(',').ToList()
-                        });
+                    var projectId = 0;
+                    if (Int32.TryParse(item, out projectId)) {
+                        var p = tb.GetProject(projectId);
+                        p.keywords = ConfigurationManager.AppSettings[item].Split(',').ToList();
+                        AllProjects.Add(p);
                     }
                 }
+                cl("Collected projects " + AllProjects.Count());
             }
             return AllProjects;
         }
@@ -41,7 +42,9 @@ namespace AutoTogglConsole
             } else {
                 handler = new ConsoleEventDelegate(ConsoleEventCallback);
                 SetConsoleCtrlHandler(handler, true);
-                tb.Init(JFUtil.Base64Encode($@"{ConfigurationManager.AppSettings["apiKey"]}:api_token"));
+                WorkspaceId = ConfigurationManager.AppSettings["WorkspaceID"].JFStringToInt();
+                tb.Init(ConfigurationManager.AppSettings["apiKey"], WorkspaceId);
+                GetProjectsFromAppSettings();
                 CheckForARunningTimer();
                 while (true) {
                     CheckIdleTime();
@@ -117,7 +120,7 @@ namespace AutoTogglConsole
         private static void StartTimer(Project project, string description = "")
         {
             var ct = tb.GetRunningTimer();
-            if (ct != null && ct.pid == project.pid && ct.description == description) {
+            if (ct != null && ct.pid == project.id && ct.description == description) {
                 clt($"A timer is already running for {project.name}.");
             } else {
                 TimeEntryWrapper wrapper = new TimeEntryWrapper();

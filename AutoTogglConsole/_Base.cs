@@ -8,6 +8,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using TogglConnect;
 
 namespace AutoTogglConsole
 {
@@ -71,7 +72,7 @@ namespace AutoTogglConsole
         public static bool ConsoleEventCallback(int eventType)
         {
             var tb = TogglBase.GetInstance();
-            tb.Init(JFUtil.Base64Encode($@"{ConfigurationManager.AppSettings["apiKey"]}:api_token"));
+            tb.Init(ConfigurationManager.AppSettings["apiKey"], ConfigurationManager.AppSettings["delay"].JFStringToInt());
             tb.StopRunningTimer();
             
             if (eventType == 2) {
