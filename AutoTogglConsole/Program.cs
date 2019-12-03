@@ -35,6 +35,7 @@ namespace AutoTogglConsole
 
         static void Main(string[] args)
         {
+            EnsureSingleInstance();
             if (ConfigurationManager.AppSettings == null || ConfigurationManager.AppSettings.Count == 0) {
                 Console.WriteLine("Application settings are missing.");
                 Console.ReadLine();

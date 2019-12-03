@@ -8,6 +8,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using static SharedLibrary.ConsoleShortcuts;
 
 namespace AutoTogglConsole
 {
@@ -79,6 +80,13 @@ namespace AutoTogglConsole
                 Debug.WriteLine("Console window closing, death imminent");
             }
             return false;
+        }
+
+        public static void EnsureSingleInstance()
+        {
+            if (Process.GetProcessesByName("AutoTogglConsole").Count() > 1) {
+                ExitApp();
+            }
         }
     }
 }
