@@ -128,7 +128,7 @@ namespace AutoTogglConsole
                 wrapper.time_entry = new TimeEntry() {
                     description = description
                     , wid = int.Parse(ConfigurationManager.AppSettings["WorkspaceID"])
-                    , pid = project.pid
+                    , pid = project.id
                     , created_with = ".net"
                 };
                 tb.StartTimer(wrapper);
