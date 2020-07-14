@@ -29,7 +29,7 @@ namespace AutoTogglConsole
                         AllProjects.Add(p);
                     }
                 }
-                cl("Collected projects " + AllProjects.Count());
+                cl($"Collected projects: " + AllProjects.Count());
             }
             return AllProjects;
         }
