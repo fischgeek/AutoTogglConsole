@@ -43,7 +43,7 @@ AutoTogglConsole uses your Workspace and Project ID's from your Toggl account. F
 
 1. Add a new key/value pair below the example in the **AutoToggleConsole.exe.config** file
    - Replace the **key** with the actual Project ID you found
-   - Replace the **value** with a comma separated list of keywords that appear in a window's title you consider to be apart of the project
+   - Replace the **value** with a comma separated list of keywords that appear in a window's title you consider to be a part of the project
    - You should end up with something like the below
      - `<add key="12345" value="notepad,untitled - notepad,notepad++" />`
 
