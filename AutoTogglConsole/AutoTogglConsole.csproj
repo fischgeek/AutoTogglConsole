@@ -66,5 +66,11 @@
     <None Include="packages.config" />
     <None Include="publish.ahk" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AutoTogglConsole.FSharp\AutoTogglConsole.FSharp.fsproj">
+      <Project>{ecc492ec-6793-4cd2-a677-264015c090cd}</Project>
+      <Name>AutoTogglConsole.FSharp</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

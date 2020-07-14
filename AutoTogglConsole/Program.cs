@@ -5,6 +5,7 @@ using System.Configuration;
 using System.Linq;
 using System.Text.RegularExpressions;
 using TogglConnect;
+using static AutoTogglConsole.FSharp.ConfigOps;
 using static SharedLibrary.ConsoleShortcuts;
 
 namespace AutoTogglConsole
@@ -18,21 +19,7 @@ namespace AutoTogglConsole
         public static bool aTimerIsRunning = false;
         public static List<Project> AllProjects = new List<Project>();
 
-        private static List<Project> GetProjectsFromAppSettings()
-        {
-            if (AllProjects.Count == 0) {
-                foreach (string item in ConfigurationManager.AppSettings.Keys) {
-                    var projectId = 0;
-                    if (Int32.TryParse(item, out projectId)) {
-                        var p = tb.GetProject(projectId);
-                        p.keywords = ConfigurationManager.AppSettings[item].Split(',').ToList();
-                        AllProjects.Add(p);
-                    }
-                }
-                cl("Collected projects " + AllProjects.Count());
-            }
-            return AllProjects;
-        }
+        private static Config.Project[] GetProjectsFromConfig() => GetConfig().Project;
 
         static void Main(string[] args)
         {
@@ -45,7 +32,7 @@ namespace AutoTogglConsole
                 SetConsoleCtrlHandler(handler, true);
                 WorkspaceId = ConfigurationManager.AppSettings["WorkspaceID"].JFStringToInt();
                 tb.Init(ConfigurationManager.AppSettings["apiKey"], WorkspaceId);
-                GetProjectsFromAppSettings();
+                GetProjectsFromConfig();
                 CheckForARunningTimer();
                 while (true) {
                     CheckIdleTime();
@@ -71,7 +58,7 @@ namespace AutoTogglConsole
                 if (CurrentActiveIsValid(currentActive)) {
                     clt(currentActive);
                     var anyMatches = false;
-                    foreach (var project in GetProjectsFromAppSettings()) {
+                    foreach (var project in GetProjectsFromConfig()) {
                         if (KeywordExistsInActiveWindowTitle(project, currentActive)) {
                             StartTimer(project, currentActive);
                             anyMatches = true;
@@ -92,9 +79,9 @@ namespace AutoTogglConsole
 
         private static bool CurrentActiveIsValid(string currentActive) => lastActive != currentActive && currentActive.JFIsNotNull() && !IsNeutralWindow(currentActive);
 
-        private static bool KeywordExistsInActiveWindowTitle(Project project, string currentActive)
+        private static bool KeywordExistsInActiveWindowTitle(Config.Project project, string currentActive)
         {
-            foreach (var keyword in project.keywords) {
+            foreach (var keyword in project.Keywords) {
                 var match = Regex.Match(currentActive, keyword, RegexOptions.IgnoreCase);
                 if (match.Success) {
                     return true;
@@ -118,22 +105,22 @@ namespace AutoTogglConsole
             }
         }
 
-        private static void StartTimer(Project project, string description = "")
+        private static void StartTimer(Config.Project project, string description = "")
         {
             var ct = tb.GetRunningTimer();
-            if (ct != null && ct.pid == project.id && ct.description == description) {
-                clt($"A timer is already running for {project.name}.");
+            if (ct != null && ct.pid == project.Id && ct.description == description) {
+                clt($"A timer is already running for {project.Name}.");
             } else {
                 TimeEntryWrapper wrapper = new TimeEntryWrapper();
                 wrapper.time_entry = new TimeEntry() {
                     description = description
                     , wid = int.Parse(ConfigurationManager.AppSettings["WorkspaceID"])
-                    , pid = project.id
+                    , pid = project.Id
                     , created_with = ".net"
                 };
                 tb.StartTimer(wrapper);
                 //logTimerStart(project.name); // optional logging
-                clt($"Tracking started for {project.name}.");
+                clt($"Tracking started for {project.Name}.");
             }
             aTimerIsRunning = true;
         }
