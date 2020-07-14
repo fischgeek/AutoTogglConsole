@@ -57,4 +57,4 @@ Once you have completed editing the configuration file, save and close it and ru
 
 Please feel free to open an issue or [email me](mailto:fischgeek@gmail.com) with any questions or issues you may have. I will try to help the best I can.
 
-Again, I apologize for the terrible setup experience. In the future I plan to make this easier and through the actual UI. In addition, I plan on finding the motivation I misplaced to get my primary idea [AutoToggl](https://) up and running. If you've seen or heard from it, please drop me a line.
+Again, I apologize for the terrible setup experience. In the future I plan to make this easier and through the actual UI. In addition, I plan on finding the motivation I misplaced to get my primary idea [AutoToggl](https://github.com/fischgeek/AutoToggl) up and running. If you've seen or heard from it, please drop me a line.
