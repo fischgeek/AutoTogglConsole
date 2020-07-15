@@ -1,0 +1,9 @@
+﻿{
+  "id": 1234,
+  "wid": 1234,
+  "cid": 1234,
+  "pid": 1234,
+  "name": "string",
+  "active": true,
+  "keywords": [ "string", "string2" ]
+}

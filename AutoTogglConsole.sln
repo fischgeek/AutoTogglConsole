@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoTogglConsole", "AutoTog
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "AutoTogglConsole.FSharp", "AutoTogglConsole.FSharp\AutoTogglConsole.FSharp.fsproj", "{ECC492EC-6793-4CD2-A677-264015C090CD}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "JFSharpKit", "..\JFSharpKit\JFSharpKit\JFSharpKit.fsproj", "{895C8287-D36D-4369-8384-F55EAC57551D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +33,14 @@ Global
 		{ECC492EC-6793-4CD2-A677-264015C090CD}.Dev2|Any CPU.Build.0 = Debug|Any CPU
 		{ECC492EC-6793-4CD2-A677-264015C090CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ECC492EC-6793-4CD2-A677-264015C090CD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{895C8287-D36D-4369-8384-F55EAC57551D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{895C8287-D36D-4369-8384-F55EAC57551D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{895C8287-D36D-4369-8384-F55EAC57551D}.Dev|Any CPU.ActiveCfg = Debug|Any CPU
+		{895C8287-D36D-4369-8384-F55EAC57551D}.Dev|Any CPU.Build.0 = Debug|Any CPU
+		{895C8287-D36D-4369-8384-F55EAC57551D}.Dev2|Any CPU.ActiveCfg = Debug|Any CPU
+		{895C8287-D36D-4369-8384-F55EAC57551D}.Dev2|Any CPU.Build.0 = Debug|Any CPU
+		{895C8287-D36D-4369-8384-F55EAC57551D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{895C8287-D36D-4369-8384-F55EAC57551D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

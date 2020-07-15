@@ -2,8 +2,17 @@
   "ApiKey": "string",
   "WorkspaceID": "string",
   "Delay": 5000,
-  "NeutralWindowRegex": "string",
-  "Project": [
+  "NeutralWindows": [ "string", "string" ],
+  "Projects": [
+    {
+      "id": 1234,
+      "wid": 1234,
+      "cid": 1234,
+      "pid": 1234,
+      "name": "string",
+      "active": true,
+      "keywords": [ "string", "string2" ]
+    },
     {
       "id": 1234,
       "wid": 1234,

@@ -5,7 +5,8 @@ using System.Configuration;
 using System.Linq;
 using System.Text.RegularExpressions;
 using TogglConnect;
-using static AutoTogglConsole.FSharp.ConfigOps;
+using AutoTogglConsole.FSharp;
+using static AutoTogglConsole.FSharp.Settings;
 using static SharedLibrary.ConsoleShortcuts;
 
 namespace AutoTogglConsole
@@ -13,32 +14,28 @@ namespace AutoTogglConsole
     class Program : _Base
     {
         private static TogglBase tb = TogglBase.GetInstance();
-        public static int WorkspaceId;
         public static string lastActive = string.Empty;
         public static bool idle = false;
         public static bool aTimerIsRunning = false;
-        public static List<Project> AllProjects = new List<Project>();
-
-        private static Config.Project[] GetProjectsFromConfig() => GetConfig().Project;
+        private static MyConfig config = null;
 
         static void Main(string[] args)
         {
             EnsureSingleInstance();
-            if (ConfigurationManager.AppSettings == null || ConfigurationManager.AppSettings.Count == 0) {
-                Console.WriteLine("Application settings are missing.");
+            try {
+                config = GetConfig();
+            } catch (Exception ex) {
+                ce($"Failed due to error(s): {ex.Message}");
                 Console.ReadLine();
-            } else {
-                handler = new ConsoleEventDelegate(ConsoleEventCallback);
-                SetConsoleCtrlHandler(handler, true);
-                WorkspaceId = ConfigurationManager.AppSettings["WorkspaceID"].JFStringToInt();
-                tb.Init(ConfigurationManager.AppSettings["apiKey"], WorkspaceId);
-                GetProjectsFromConfig();
-                CheckForARunningTimer();
-                while (true) {
-                    CheckIdleTime();
-                    CheckActiveWindow();
-                    System.Threading.Thread.Sleep(ConfigurationManager.AppSettings["delay"].JFStringToInt());
-                }
+            }
+            handler = new ConsoleEventDelegate(ConsoleEventCallback);
+            SetConsoleCtrlHandler(handler, true);
+            tb.Init(config.ApiToken, config.WorkspaceId);
+            CheckForARunningTimer();
+            while (true) {
+                CheckIdleTime();
+                CheckActiveWindow();
+                System.Threading.Thread.Sleep(config.Delay);
             }
         }
 
@@ -58,7 +55,7 @@ namespace AutoTogglConsole
                 if (CurrentActiveIsValid(currentActive)) {
                     clt(currentActive);
                     var anyMatches = false;
-                    foreach (var project in GetProjectsFromConfig()) {
+                    foreach (var project in config.Projects) {
                         if (KeywordExistsInActiveWindowTitle(project, currentActive)) {
                             StartTimer(project, currentActive);
                             anyMatches = true;
@@ -79,9 +76,9 @@ namespace AutoTogglConsole
 
         private static bool CurrentActiveIsValid(string currentActive) => lastActive != currentActive && currentActive.JFIsNotNull() && !IsNeutralWindow(currentActive);
 
-        private static bool KeywordExistsInActiveWindowTitle(Config.Project project, string currentActive)
+        private static bool KeywordExistsInActiveWindowTitle(Settings.Project project, string currentActive)
         {
-            foreach (var keyword in project.Keywords) {
+            foreach (var keyword in project.keywords) {
                 var match = Regex.Match(currentActive, keyword, RegexOptions.IgnoreCase);
                 if (match.Success) {
                     return true;
@@ -105,22 +102,22 @@ namespace AutoTogglConsole
             }
         }
 
-        private static void StartTimer(Config.Project project, string description = "")
+        private static void StartTimer(Settings.Project project, string description = "")
         {
             var ct = tb.GetRunningTimer();
-            if (ct != null && ct.pid == project.Id && ct.description == description) {
-                clt($"A timer is already running for {project.Name}.");
+            if (ct != null && ct.pid == project.id && ct.description == description) {
+                clt($"A timer is already running for {project.name}.");
             } else {
                 TimeEntryWrapper wrapper = new TimeEntryWrapper();
                 wrapper.time_entry = new TimeEntry() {
                     description = description
                     , wid = int.Parse(ConfigurationManager.AppSettings["WorkspaceID"])
-                    , pid = project.Id
+                    , pid = project.id
                     , created_with = ".net"
                 };
                 tb.StartTimer(wrapper);
                 //logTimerStart(project.name); // optional logging
-                clt($"Tracking started for {project.Name}.");
+                clt($"Tracking started for {project.name}.");
             }
             aTimerIsRunning = true;
         }
